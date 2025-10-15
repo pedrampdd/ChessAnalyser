@@ -1,4 +1,4 @@
-# Chess Game Analyzer API
+# Chess.com Golang Game Analyzer API
 
 A Go-based REST API for analyzing chess games using the Chess.com Published Data API.
 

@@ -1,18 +1,18 @@
-# Chess.com Golang Game Analyzer API
+# Chess.com API Golang Client & Analyzer
 
-A Go-based REST API for analyzing chess games using the Chess.com Published Data API and Stockfish engine.
+A comprehensive Go-based REST API client and analyzer for Chess.com with Stockfish engine integration for advanced PGN analysis and position evaluation.
 
 ## Features
 
-- Retrieve chess game information by game ID
-- Get player profiles and statistics
-- Fetch player's games by month
-- **PGN Analysis with Stockfish Engine**
-- **Position Analysis and Move Evaluation**
-- **Game Accuracy Metrics and Statistics**
-- **Multi-engine Concurrent Analysis**
-- Caching for improved performance
-- RESTful API design with JSON responses
+- **Chess.com API Client** - Complete Go client for Chess.com Published Data API
+- **Game Retrieval** - Get chess games, player profiles, and statistics
+- **PGN Analysis** - Advanced game analysis using Stockfish engine
+- **Position Analysis** - Real-time position evaluation and move suggestions
+- **Accuracy Metrics** - Blunder detection, mistake analysis, and accuracy scoring
+- **Multi-engine Support** - Concurrent analysis with engine pooling
+- **RESTful API** - Clean JSON API with comprehensive documentation
+- **Caching** - Intelligent caching for improved performance
+- **Docker Support** - Easy deployment with Docker and Docker Compose
 
 ## API Endpoints
 
@@ -554,3 +554,7 @@ Cache invalidation occurs when:
 ## License
 
 This project is licensed under the MIT License.
+
+## Keywords
+
+`chess.com api golang` `chess api client` `golang chess` `chess.com golang` `chess api go` `stockfish golang` `chess analysis go` `chess.com client` `golang chess engine` `chess pgn analysis` `chess position analysis` `chess accuracy metrics` `chess blunder detection` `chess.com published data api` `golang chess library` `chess game analysis` `chess engine integration` `chess api wrapper` `golang chess client` `chess.com go client`

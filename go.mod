@@ -1,4 +1,4 @@
-module chess-analyzer
+module github.com/pedrampdd/chess-com-api-golang
 
 go 1.21
 

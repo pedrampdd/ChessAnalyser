@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"chess-analyzer/internal/models"
+	"github.com/pedrampdd/ChessAnalyser/internal/models"
 )
 
 // PGNParser handles parsing of PGN (Portable Game Notation) files

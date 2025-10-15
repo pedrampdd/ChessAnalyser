@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 
-	"chess-analyzer/internal/api"
-	"chess-analyzer/internal/config"
-	"chess-analyzer/internal/models"
-	service "chess-analyzer/internal/service"
+	"github.com/pedrampdd/ChessAnalyser/internal/api"
+	"github.com/pedrampdd/ChessAnalyser/internal/config"
+	"github.com/pedrampdd/ChessAnalyser/internal/models"
+	service "github.com/pedrampdd/ChessAnalyser/internal/service"
 )
 
 func main() {

@@ -6,10 +6,10 @@ import (
 	"sync"
 	"time"
 
-	"chess-analyzer/internal/engine"
-	"chess-analyzer/internal/models"
-	"chess-analyzer/internal/parser"
-	"chess-analyzer/pkg/errors"
+	"github.com/pedrampdd/ChessAnalyser/internal/engine"
+	"github.com/pedrampdd/ChessAnalyser/internal/models"
+	"github.com/pedrampdd/ChessAnalyser/internal/parser"
+	"github.com/pedrampdd/ChessAnalyser/pkg/errors"
 )
 
 // AnalysisService provides chess game analysis using Stockfish engine

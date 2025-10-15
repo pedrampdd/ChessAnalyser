@@ -213,8 +213,8 @@ import (
     "context"
     "log"
     
-    "chess-analyzer/internal/models"
-    "chess-analyzer/internal/service"
+    "github.com/pedrampdd/ChessAnalyser/internal/models"
+    "github.com/pedrampdd/ChessAnalyser/internal/service"
 )
 
 func main() {

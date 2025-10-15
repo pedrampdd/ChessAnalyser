@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"chess-analyzer/internal/models"
+	"github.com/pedrampdd/ChessAnalyser/internal/models"
 )
 
 // StockfishEngine represents a Stockfish chess engine instance

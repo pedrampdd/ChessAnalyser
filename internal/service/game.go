@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"chess-analyzer/internal/client"
-	"chess-analyzer/internal/models"
-	"chess-analyzer/pkg/errors"
+	"github.com/pedrampdd/ChessAnalyser/internal/client"
+	"github.com/pedrampdd/ChessAnalyser/internal/models"
+	"github.com/pedrampdd/ChessAnalyser/pkg/errors"
 )
 
 // GameAnalyzerService represents the main service for game analysis

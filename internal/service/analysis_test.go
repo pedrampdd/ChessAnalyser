@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"chess-analyzer/internal/models"
-	"chess-analyzer/internal/service"
+	"github.com/pedrampdd/ChessAnalyser/internal/models"
+	"github.com/pedrampdd/ChessAnalyser/internal/service"
 )
 
 func TestAnalysisService_AnalyzeGame(t *testing.T) {

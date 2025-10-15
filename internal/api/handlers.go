@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"chess-analyzer/internal/models"
-	"chess-analyzer/internal/service"
-	"chess-analyzer/pkg/errors"
+	"github.com/pedrampdd/ChessAnalyser/internal/models"
+	"github.com/pedrampdd/ChessAnalyser/internal/service"
+	"github.com/pedrampdd/ChessAnalyser/pkg/errors"
 
 	"github.com/gin-gonic/gin"
 )

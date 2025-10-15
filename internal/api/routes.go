@@ -1,7 +1,7 @@
 package api
 
 import (
-	service "chess-analyzer/internal/service"
+	service "github.com/pedrampdd/ChessAnalyser/internal/service"
 
 	"github.com/gin-gonic/gin"
 )

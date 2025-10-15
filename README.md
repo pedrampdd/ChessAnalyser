@@ -1,12 +1,16 @@
 # Chess.com Golang Game Analyzer API
 
-A Go-based REST API for analyzing chess games using the Chess.com Published Data API.
+A Go-based REST API for analyzing chess games using the Chess.com Published Data API and Stockfish engine.
 
 ## Features
 
 - Retrieve chess game information by game ID
 - Get player profiles and statistics
 - Fetch player's games by month
+- **PGN Analysis with Stockfish Engine**
+- **Position Analysis and Move Evaluation**
+- **Game Accuracy Metrics and Statistics**
+- **Multi-engine Concurrent Analysis**
 - Caching for improved performance
 - RESTful API design with JSON responses
 
@@ -168,20 +172,229 @@ GET /api/player/{username}/stats
 }
 ```
 
+## PGN Analysis Endpoints
+
+### Analyze Chess Game
+```
+POST /api/analyze/game
+```
+
+Analyze a complete chess game using Stockfish engine.
+
+**Request Body:**
+```json
+{
+  "pgn": "[Event \"Test Game\"]\n[Site \"Test Site\"]\n[Date \"2023.01.01\"]\n[Round \"1\"]\n[White \"TestWhite\"]\n[Black \"TestBlack\"]\n[Result \"1-0\"]\n\n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8 10. d4 Nbd7 1-0",
+  "settings": {
+    "depth": 15,
+    "time_limit": 5000,
+    "threads": 4,
+    "hash_size": 128,
+    "multipv": 1
+  },
+  "include_moves": true,
+  "max_moves": 50
+}
+```
+
+**Parameters:**
+- `pgn` (required): PGN string to analyze
+- `settings` (optional): Engine analysis settings
+  - `depth`: Search depth (default: 15)
+  - `time_limit`: Time limit in milliseconds (default: 5000)
+  - `threads`: Number of threads (default: 4)
+  - `hash_size`: Hash table size in MB (default: 128)
+  - `multipv`: Number of principal variations (default: 1)
+- `include_moves` (optional): Include move-by-move analysis (default: true)
+- `max_moves` (optional): Maximum moves to analyze (default: 0 = all)
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "game_id": "12345",
+    "pgn": "[Event \"Test Game\"]...",
+    "analysis_time": "2023-01-01T12:00:00Z",
+    "engine_version": "Stockfish 17.1",
+    "engine_settings": {
+      "depth": 15,
+      "time_limit": 5000,
+      "threads": 4,
+      "hash_size": 128,
+      "multipv": 1
+    },
+    "moves": [
+      {
+        "move": "e4",
+        "move_number": 1,
+        "evaluation": 0.2,
+        "accuracy": 95.5,
+        "blunder": false,
+        "mistake": false,
+        "inaccuracy": false,
+        "best_move": "e4",
+        "alternatives": []
+      },
+      {
+        "move": "e5",
+        "move_number": 1,
+        "evaluation": 0.1,
+        "accuracy": 98.2,
+        "blunder": false,
+        "mistake": false,
+        "inaccuracy": false,
+        "best_move": "e5",
+        "alternatives": []
+      }
+    ],
+    "accuracy": {
+      "white_accuracy": 92.3,
+      "black_accuracy": 89.7,
+      "average_accuracy": 91.0,
+      "blunders": 2,
+      "mistakes": 5,
+      "inaccuracies": 8,
+      "brilliant_moves": 1,
+      "great_moves": 3,
+      "best_moves": 15
+    },
+    "summary": {
+      "total_moves": 40,
+      "analysis_depth": 15,
+      "total_time": 45000,
+      "nodes_searched": 15000000,
+      "game_phase": "middlegame",
+      "complexity": "medium",
+      "recommendations": [
+        "Focus on tactical calculations to reduce blunders",
+        "Study opening theory to improve early game play"
+      ]
+    }
+  },
+  "message": "Game analysis completed successfully"
+}
+```
+
+### Analyze Chess Position
+```
+GET /api/analyze/position?fen=rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR%20w%20KQkq%20-%200%201&depth=15&time_limit=5000
+```
+
+Analyze a single chess position using Stockfish engine.
+
+**Query Parameters:**
+- `fen` (required): FEN position string
+- `depth` (optional): Search depth (default: 15)
+- `time_limit` (optional): Time limit in milliseconds (default: 5000)
+- `threads` (optional): Number of threads (default: 4)
+- `hash_size` (optional): Hash table size in MB (default: 128)
+- `multipv` (optional): Number of principal variations (default: 1)
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "position": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+    "move_number": 0,
+    "best_move": "e4",
+    "evaluation": 0.2,
+    "depth": 15,
+    "nodes": 1500000,
+    "time": 5000,
+    "pv": ["e4", "e5", "Nf3", "Nc6", "Bb5"]
+  }
+}
+```
+
+### Get Engine Status
+```
+GET /api/analyze/status
+```
+
+Get the status of analysis engines in the pool.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "total_engines": 4,
+    "available_engines": 3,
+    "cache_size": 150,
+    "max_cache_size": 1000
+  }
+}
+```
+
+### Clear Analysis Cache
+```
+DELETE /api/analyze/cache
+```
+
+Clear the analysis cache to free memory.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "message": "Analysis cache cleared successfully"
+  }
+}
+```
+
 ## Installation and Setup
 
 1. **Install Go** (version 1.21 or higher)
 
-2. **Clone and setup the project:**
+2. **Install Stockfish Engine:**
+   
+   **Ubuntu/Debian:**
+   ```bash
+   sudo apt update
+   sudo apt install stockfish
+   ```
+   
+   **macOS:**
+   ```bash
+   brew install stockfish
+   ```
+   
+   **Windows:**
+   - Download from https://stockfishchess.org/download/
+   - Extract and add to PATH
+   
+   **Manual Installation:**
+   ```bash
+   # Download latest release
+   wget https://github.com/official-stockfish/Stockfish/releases/latest/download/stockfish-ubuntu-x86-64-avx2.tar.gz
+   tar -xzf stockfish-ubuntu-x86-64-avx2.tar.gz
+   mv stockfish-ubuntu-x86-64-avx2 stockfish
+   ```
+
+3. **Clone and setup the project:**
    ```bash
    git clone <repository-url>
    cd chessAnalyser
    go mod tidy
    ```
 
-3. **Run the server:**
+4. **Configure Stockfish (Optional):**
    ```bash
-   go run main.go
+   # Set custom Stockfish path if needed
+   export STOCKFISH_PATH="/path/to/stockfish"
+   
+   # Configure analysis settings
+   export STOCKFISH_MAX_ENGINES=4
+   export STOCKFISH_DEFAULT_DEPTH=15
+   export STOCKFISH_DEFAULT_TIME_LIMIT=5000
+   ```
+
+5. **Run the server:**
+   ```bash
+   go run cmd/server/main.go
    ```
 
    The server will start on `http://localhost:8080`
@@ -202,6 +415,27 @@ curl "http://localhost:8080/api/player/hikaru/profile"
 
 # Get player statistics
 curl "http://localhost:8080/api/player/hikaru/stats"
+
+# Analyze a chess game
+curl -X POST "http://localhost:8080/api/analyze/game" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pgn": "[Event \"Test Game\"]\n[Site \"Test Site\"]\n[Date \"2023.01.01\"]\n[Round \"1\"]\n[White \"TestWhite\"]\n[Black \"TestBlack\"]\n[Result \"1-0\"]\n\n1. e4 e5 2. Nf3 Nc6 1-0",
+    "settings": {
+      "depth": 15,
+      "time_limit": 5000
+    },
+    "max_moves": 10
+  }'
+
+# Analyze a chess position
+curl "http://localhost:8080/api/analyze/position?fen=rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR%20w%20KQkq%20-%200%201&depth=15"
+
+# Get engine status
+curl "http://localhost:8080/api/analyze/status"
+
+# Clear analysis cache
+curl -X DELETE "http://localhost:8080/api/analyze/cache"
 ```
 
 ### Using JavaScript/Fetch
@@ -218,6 +452,40 @@ if (data.success) {
   console.log('PGN:', data.data.pgn);
 } else {
   console.error('Error:', data.error);
+}
+
+// Analyze a chess game
+const analysisResponse = await fetch('http://localhost:8080/api/analyze/game', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    pgn: '[Event "Test Game"]\n[Site "Test Site"]\n[Date "2023.01.01"]\n[Round "1"]\n[White "TestWhite"]\n[Black "TestBlack"]\n[Result "1-0"]\n\n1. e4 e5 2. Nf3 Nc6 1-0',
+    settings: {
+      depth: 15,
+      time_limit: 5000
+    },
+    max_moves: 10
+  })
+});
+
+const analysisData = await analysisResponse.json();
+if (analysisData.success) {
+  console.log('Analysis completed!');
+  console.log('Average accuracy:', analysisData.data.accuracy.average_accuracy);
+  console.log('Blunders:', analysisData.data.accuracy.blunders);
+  console.log('Mistakes:', analysisData.data.accuracy.mistakes);
+  console.log('Recommendations:', analysisData.data.summary.recommendations);
+}
+
+// Analyze a chess position
+const positionResponse = await fetch('http://localhost:8080/api/analyze/position?fen=rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR%20w%20KQkq%20-%200%201&depth=15');
+const positionData = await positionResponse.json();
+if (positionData.success) {
+  console.log('Best move:', positionData.data.best_move);
+  console.log('Evaluation:', positionData.data.evaluation);
+  console.log('Principal variation:', positionData.data.pv);
 }
 ```
 
@@ -259,14 +527,21 @@ Cache invalidation occurs when:
 
 ## Future Enhancements
 
+- [x] **PGN Analysis with Stockfish Engine** ✅
+- [x] **Position Analysis and Move Evaluation** ✅
+- [x] **Game Accuracy Metrics and Statistics** ✅
+- [x] **Multi-engine Concurrent Analysis** ✅
+- [ ] Redis Cache
 - [ ] Direct game URL parsing
 - [ ] Game search by multiple criteria
-- [ ] Move-by-move analysis
 - [ ] Opening and endgame database integration
 - [ ] Real-time game monitoring
-- [ ] Database persistence
+- [ ] Database persistence for analysis results
 - [ ] Authentication and rate limiting
 - [ ] WebSocket support for live games
+- [ ] Advanced FEN position calculation
+- [ ] Tournament analysis features
+- [ ] Opening book integration
 
 ## Contributing
 

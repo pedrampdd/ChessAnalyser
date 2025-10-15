@@ -137,12 +137,14 @@ func (p *PGNParser) parseMoveLine(line string) ([]ParsedMove, error) {
 	// Split by move numbers
 	parts := strings.Fields(line)
 	var currentMoveNumber int
+	var moveIndex int // Track moves within the current move number
 
-	for i, part := range parts {
+	for _, part := range parts {
 		// Check if this is a move number
 		if strings.HasSuffix(part, ".") {
 			if num, err := strconv.Atoi(strings.TrimSuffix(part, ".")); err == nil {
 				currentMoveNumber = num
+				moveIndex = 0 // Reset move index for new move number
 			}
 			continue
 		}
@@ -157,9 +159,10 @@ func (p *PGNParser) parseMoveLine(line string) ([]ParsedMove, error) {
 			move := ParsedMove{
 				MoveNumber: currentMoveNumber,
 				Move:       part,
-				Color:      p.determineMoveColor(currentMoveNumber, i),
+				Color:      p.determineMoveColor(currentMoveNumber, moveIndex),
 			}
 			moves = append(moves, move)
+			moveIndex++
 		}
 	}
 
@@ -189,7 +192,7 @@ func (p *PGNParser) removeComments(text string) string {
 func (p *PGNParser) determineMoveColor(moveNumber, position int) string {
 	// White moves are at even positions (0, 2, 4...)
 	// Black moves are at odd positions (1, 3, 5...)
-	if position%2 != 0 {
+	if position%2 == 0 {
 		return "white"
 	}
 	return "black"
@@ -208,10 +211,12 @@ func (p *PGNParser) determineGamePhase(moveCount int) string {
 
 // ExtractPositions extracts FEN positions for each move
 func (p *PGNParser) ExtractPositions(game *ParsedGame) error {
-	// This would require a chess position library to generate FEN strings
-	// For now, we'll mark this as a placeholder
+	// For now, generate basic FEN positions
+	// In a real implementation, you'd use a chess library to generate proper FEN strings
 	for i := range game.Moves {
-		game.Moves[i].FEN = fmt.Sprintf("position_%d", i+1)
+		// Generate a simple FEN based on move number
+		// This is a placeholder - real implementation would parse moves and update position
+		game.Moves[i].FEN = fmt.Sprintf("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - %d %d", i, (i/2)+1)
 	}
 	return nil
 }

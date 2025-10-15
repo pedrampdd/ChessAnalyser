@@ -13,13 +13,15 @@ import (
 
 // Handler represents the API handlers
 type Handler struct {
-	gameService *service.GameAnalyzerService
+	gameService     *service.GameAnalyzerService
+	analysisService *service.AnalysisService
 }
 
 // NewHandler creates a new API handler
-func NewHandler(gameService *service.GameAnalyzerService) *Handler {
+func NewHandler(gameService *service.GameAnalyzerService, analysisService *service.AnalysisService) *Handler {
 	return &Handler{
-		gameService: gameService,
+		gameService:     gameService,
+		analysisService: analysisService,
 	}
 }
 
@@ -154,6 +156,113 @@ func (h *Handler) GetPlayerStats(c *gin.Context) {
 	})
 }
 
+// AnalyzeGame analyzes a chess game using Stockfish engine
+func (h *Handler) AnalyzeGame(c *gin.Context) {
+	var request models.AnalysisRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, models.AnalysisResponse{
+			Success: false,
+			Error:   "Invalid request format",
+		})
+		return
+	}
+
+	// Validate required fields
+	if request.PGN == "" {
+		c.JSON(http.StatusBadRequest, models.AnalysisResponse{
+			Success: false,
+			Error:   "PGN is required",
+		})
+		return
+	}
+
+	// Set default settings if not provided
+	if request.Settings.Depth == 0 {
+		request.Settings.Depth = 15
+	}
+	if request.Settings.TimeLimit == 0 {
+		request.Settings.TimeLimit = 5000
+	}
+	if request.Settings.Threads == 0 {
+		request.Settings.Threads = 4
+	}
+	if request.Settings.HashSize == 0 {
+		request.Settings.HashSize = 128
+	}
+
+	// Perform analysis
+	analysis, err := h.analysisService.AnalyzeGame(c.Request.Context(), &request)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.AnalysisResponse{
+			Success: false,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, models.AnalysisResponse{
+		Success: true,
+		Data:    analysis,
+		Message: "Game analysis completed successfully",
+	})
+}
+
+// AnalyzePosition analyzes a single chess position
+func (h *Handler) AnalyzePosition(c *gin.Context) {
+	fen := c.Query("fen")
+	if fen == "" {
+		c.JSON(http.StatusBadRequest, models.APIResponse{
+			Success: false,
+			Error:   "FEN parameter is required",
+		})
+		return
+	}
+
+	// Parse optional settings from query parameters
+	settings := models.EngineSettings{
+		Depth:     getIntQuery(c, "depth", 15),
+		TimeLimit: getIntQuery(c, "time_limit", 5000),
+		Threads:   getIntQuery(c, "threads", 4),
+		HashSize:  getIntQuery(c, "hash_size", 128),
+		MultiPV:   getIntQuery(c, "multipv", 1),
+	}
+
+	// Analyze position
+	result, err := h.analysisService.AnalyzePosition(c.Request.Context(), fen, settings)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.APIResponse{
+			Success: false,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, models.APIResponse{
+		Success: true,
+		Data:    result,
+	})
+}
+
+// GetEngineStatus returns the status of analysis engines
+func (h *Handler) GetEngineStatus(c *gin.Context) {
+	status := h.analysisService.GetEngineStatus()
+	c.JSON(http.StatusOK, models.APIResponse{
+		Success: true,
+		Data:    status,
+	})
+}
+
+// ClearAnalysisCache clears the analysis cache
+func (h *Handler) ClearAnalysisCache(c *gin.Context) {
+	h.analysisService.ClearCache()
+	c.JSON(http.StatusOK, models.APIResponse{
+		Success: true,
+		Data: map[string]string{
+			"message": "Analysis cache cleared successfully",
+		},
+	})
+}
+
 // HealthCheck provides a health check endpoint
 func (h *Handler) HealthCheck(c *gin.Context) {
 	c.JSON(http.StatusOK, models.APIResponse{
@@ -163,4 +272,14 @@ func (h *Handler) HealthCheck(c *gin.Context) {
 			"service": "chess-analyzer",
 		},
 	})
+}
+
+// getIntQuery gets an integer query parameter with a default value
+func getIntQuery(c *gin.Context, key string, defaultValue int) int {
+	if value := c.Query(key); value != "" {
+		if intValue, err := strconv.Atoi(value); err == nil {
+			return intValue
+		}
+	}
+	return defaultValue
 }

@@ -1,13 +1,13 @@
 package api
 
 import (
-	"chess-analyzer/internal/service"
+	service "chess-analyzer/internal/service"
 
 	"github.com/gin-gonic/gin"
 )
 
 // SetupRoutes configures all API routes
-func SetupRoutes(gameService *service.GameAnalyzerService) *gin.Engine {
+func SetupRoutes(gameService *service.GameAnalyzerService, analysisService *service.AnalysisService) *gin.Engine {
 	r := gin.Default()
 
 	// Add CORS middleware
@@ -25,7 +25,7 @@ func SetupRoutes(gameService *service.GameAnalyzerService) *gin.Engine {
 	})
 
 	// Initialize handlers
-	handler := NewHandler(gameService)
+	handler := NewHandler(gameService, analysisService)
 
 	// Health check endpoint
 	r.GET("/health", handler.HealthCheck)
@@ -33,10 +33,17 @@ func SetupRoutes(gameService *service.GameAnalyzerService) *gin.Engine {
 	// API routes
 	api := r.Group("/api")
 	{
+		// Game routes
 		api.GET("/game/:gameId", handler.GetGame)
 		api.GET("/player/:username/games", handler.GetPlayerGames)
 		api.GET("/player/:username/profile", handler.GetPlayerProfile)
 		api.GET("/player/:username/stats", handler.GetPlayerStats)
+
+		// Analysis routes
+		api.POST("/analyze/game", handler.AnalyzeGame)
+		api.GET("/analyze/position", handler.AnalyzePosition)
+		api.GET("/analyze/status", handler.GetEngineStatus)
+		api.DELETE("/analyze/cache", handler.ClearAnalysisCache)
 	}
 
 	return r

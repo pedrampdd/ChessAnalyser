@@ -17,6 +17,7 @@ A comprehensive Go-based REST API client and analyzer for Chess.com with Stockfi
 ## API Endpoints
 
 ### Get Game by ID
+(not yet!)
 ```
 GET /api/game/{gameId}
 ```

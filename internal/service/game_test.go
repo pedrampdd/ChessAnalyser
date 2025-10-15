@@ -44,19 +44,19 @@ func TestParseGameData(t *testing.T) {
 	service := NewGameAnalyzerService()
 
 	// Mock game data
-	gameData := map[string]interface{}{
+	gameData := map[string]any{
 		"url":          "https://www.chess.com/game/live/123456789",
 		"fen":          "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
 		"pgn":          "1. e4 e5 2. Nf3 Nc6",
 		"time_control": "600+0",
 		"rules":        "chess",
-		"white": map[string]interface{}{
+		"white": map[string]any{
 			"username":  "hikaru",
 			"player_id": float64(123456),
 			"title":     "GM",
 			"country":   "US",
 		},
-		"black": map[string]interface{}{
+		"black": map[string]any{
 			"username":  "magnus",
 			"player_id": float64(789012),
 			"title":     "GM",

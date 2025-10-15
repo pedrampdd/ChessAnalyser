@@ -51,7 +51,7 @@ func (s *GameAnalyzerService) GetPlayerGames(username string, year, month int) (
 		return nil, errors.NewAPIError("failed to retrieve games", err)
 	}
 
-	gameInfo, err := s.parseGameData(gameData)
+	gameInfo, err := s.parseGameData(gameData["games"].([]any)[0].(map[string]any))
 	if err != nil {
 		return nil, errors.NewAPIError("failed to parse games", err)
 	}
@@ -60,12 +60,12 @@ func (s *GameAnalyzerService) GetPlayerGames(username string, year, month int) (
 }
 
 // GetPlayerProfile retrieves player profile information
-func (s *GameAnalyzerService) GetPlayerProfile(username string) (map[string]interface{}, error) {
+func (s *GameAnalyzerService) GetPlayerProfile(username string) (map[string]any, error) {
 	return s.chessAPI.GetPlayerProfile(username)
 }
 
 // GetPlayerStats retrieves player's statistics
-func (s *GameAnalyzerService) GetPlayerStats(username string) (map[string]interface{}, error) {
+func (s *GameAnalyzerService) GetPlayerStats(username string) (map[string]any, error) {
 	return s.chessAPI.GetPlayerStats(username)
 }
 
@@ -108,8 +108,8 @@ func (s *GameAnalyzerService) getGameFromPlayerMonth(username string, year, mont
 	}
 
 	// Parse games and return the first one (or implement specific game selection)
-	if games, ok := gamesData["games"].([]interface{}); ok && len(games) > 0 {
-		gameData := games[0].(map[string]interface{})
+	if games, ok := gamesData["games"].([]any); ok && len(games) > 0 {
+		gameData := games[0].(map[string]any)
 		return s.parseGameData(gameData)
 	}
 
@@ -124,11 +124,10 @@ func (s *GameAnalyzerService) searchGameByID(gameID string) (*models.GameInfo, e
 }
 
 // parseGameData parses raw game data from Chess.com API into GameInfo struct
-func (s *GameAnalyzerService) parseGameData(gameData map[string]interface{}) (*models.GameInfo, error) {
+func (s *GameAnalyzerService) parseGameData(gameData map[string]any) (*models.GameInfo, error) {
 	// Extract player information
-	gameData, _ = gameData["games"].([]interface{})[0].(map[string]interface{})
-	whiteData, _ := gameData["white"].(map[string]interface{})
-	blackData, _ := gameData["black"].(map[string]interface{})
+	whiteData, _ := gameData["white"].(map[string]any)
+	blackData, _ := gameData["black"].(map[string]any)
 
 	whitePlayer := models.Player{
 		Username: getStringValue(whiteData, "username"),
@@ -187,21 +186,21 @@ func (s *GameAnalyzerService) parseGameData(gameData map[string]interface{}) (*m
 }
 
 // Helper functions for type conversion
-func getStringValue(data map[string]interface{}, key string) string {
+func getStringValue(data map[string]any, key string) string {
 	if val, ok := data[key].(string); ok {
 		return val
 	}
 	return ""
 }
 
-func getFloatValue(data map[string]interface{}, key string) float64 {
+func getFloatValue(data map[string]any, key string) float64 {
 	if val, ok := data[key].(float64); ok {
 		return val
 	}
 	return 0
 }
 
-func getBoolValue(data map[string]interface{}, key string) bool {
+func getBoolValue(data map[string]any, key string) bool {
 	if val, ok := data[key].(bool); ok {
 		return val
 	}

@@ -7,9 +7,16 @@ services:
       - "8080:8080"
     environment:
       - GIN_MODE=release
+      # Server Configuration
+      - SERVER_PORT=8080
+      - SERVER_HOST=0.0.0.0
+      # Chess.com API Configuration
+      - CHESS_API_BASE_URL=https://api.chess.com/pub
+      - CHESS_API_USER_AGENT=ChessAnalyzer/1.0
+      - CHESS_API_TIMEOUT=30
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/api/player/hikaru/profile"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 3

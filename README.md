@@ -1,4 +1,4 @@
-# Chess.com API Golang Client & Analyzer
+# Chess.com API Golang Client & Game Analyzer with Stockfish
 
 A comprehensive Go-based REST API client and analyzer for Chess.com with Stockfish engine integration for advanced PGN analysis and position evaluation.
 
